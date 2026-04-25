@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#93c5fd"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#52b788"/>
+      <stop offset="100%" stop-color="#1b4332"/>
+    </linearGradient>
+    <clipPath id="bgClip">
+      <rect width="512" height="512" rx="80"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#bgClip)">
+    <!-- Sky background -->
+    <rect width="512" height="512" fill="url(#bg)"/>
+
+    <!-- Green grass hill -->
+    <ellipse cx="256" cy="540" rx="400" ry="180" fill="url(#grass)"/>
+
+    <!-- Tiny grass blades -->
+    <g fill="#1b4332" opacity="0.6">
+      <path d="M 70,400 L 75,372 L 80,400 Z"/>
+      <path d="M 100,410 L 106,378 L 112,410 Z"/>
+      <path d="M 410,405 L 415,378 L 420,405 Z"/>
+      <path d="M 440,395 L 445,370 L 450,395 Z"/>
+    </g>
+
+    <!-- Paw print -->
+    <g fill="white">
+      <ellipse cx="256" cy="295" rx="135" ry="105"/>
+      <circle cx="148" cy="190" r="48"/>
+      <circle cx="256" cy="135" r="48"/>
+      <circle cx="364" cy="190" r="48"/>
+    </g>
+  </g>
+</svg>
