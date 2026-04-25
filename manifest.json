@@ -1,0 +1,19 @@
+{
+  "name": "Blake's Business",
+  "short_name": "Blake's",
+  "description": "Dog walking & lawn care business tracker",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#dbeafe",
+  "theme_color": "#2d6a4f",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
