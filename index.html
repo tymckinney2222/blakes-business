@@ -68,12 +68,12 @@
   }
   .tab {
     flex: 1;
-    min-width: 70px;
-    padding: 8px 6px;
+    min-width: 64px;
+    padding: 8px 4px;
     border: none;
     border-radius: 12px 12px 0 0;
     font-family: 'Nunito', sans-serif;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     cursor: pointer;
     background: rgba(0,0,0,0.06);
@@ -83,7 +83,7 @@
     line-height: 1.3;
   }
   .tab.active { background: white; color: var(--green); box-shadow: 0 -2px 8px rgba(0,0,0,0.08); }
-  .tab .tab-icon { font-size: 1.1rem; display: block; }
+  .tab .tab-icon { font-size: 1.05rem; display: block; }
 
   .content {
     background: white;
@@ -279,6 +279,91 @@
   }
   .checkbox-row input { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
   .checkbox-row .ch-amt { margin-left: auto; font-weight: 700; color: var(--green); }
+
+  /* Calendar */
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+  }
+  .cal-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.15rem;
+    color: var(--green);
+  }
+  .cal-nav {
+    background: var(--green-pale);
+    color: var(--green);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .cal-nav:active { background: var(--green-light); color: white; }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 0.4rem;
+  }
+  .cal-dow {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--muted);
+    padding: 4px 0;
+    text-transform: uppercase;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    background: var(--bg);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s;
+    position: relative;
+    min-height: 38px;
+    border: 2px solid transparent;
+  }
+  .cal-day:active { transform: scale(0.92); }
+  .cal-empty { background: transparent; cursor: default; }
+  .cal-num {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .cal-today { background: var(--green); }
+  .cal-today .cal-num { color: white; }
+  .cal-has-events {
+    border-color: var(--gold);
+    background: white;
+  }
+  .cal-has-events.cal-today { background: var(--green); border-color: var(--gold); }
+  .cal-selected {
+    background: var(--green-pale);
+    border-color: var(--green);
+  }
+  .cal-selected .cal-num { color: var(--green); }
+  .cal-dots {
+    display: flex;
+    gap: 2px;
+    margin-top: 2px;
+  }
+  .cal-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .cal-today .cal-dot { background: white; }
 </style>
 </head>
 <body>
@@ -304,6 +389,7 @@
   <button class="tab" onclick="switchTab(event,'customers')"><span class="tab-icon">👥</span>Customers</button>
   <button class="tab" onclick="switchTab(event,'dogs')"><span class="tab-icon">🐾</span>Dogs</button>
   <button class="tab" onclick="switchTab(event,'bookings')"><span class="tab-icon">📅</span>Bookings</button>
+  <button class="tab" onclick="switchTab(event,'calendar')"><span class="tab-icon">🗓️</span>Calendar</button>
   <button class="tab" id="tab-inbox" onclick="switchTab(event,'inbox')"><span class="tab-icon">📥</span>Inbox</button>
 </div>
 
@@ -467,6 +553,12 @@
     <div id="bookingsList"><div class="empty"><div class="empty-icon">📅</div><p>No bookings yet! Get out there!</p></div></div>
   </div>
 
+  <!-- CALENDAR TAB -->
+  <div class="page" id="page-calendar">
+    <div class="section-title">🗓️ Blake's Calendar</div>
+    <div id="calendarContainer"></div>
+  </div>
+
   <!-- INBOX TAB -->
   <div class="page" id="page-inbox">
     <div class="section-title">📥 Customer Requests</div>
@@ -532,6 +624,7 @@
     document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
     document.getElementById('page-' + tab).classList.add('active');
     ev.currentTarget.classList.add('active');
+    if (tab === 'calendar') renderCalendar();
   }
 
   function getJobPrice(service) {
@@ -920,7 +1013,7 @@
 
   // ---- INBOX (customer requests from request.html) ----
   var WORKER_URL = 'https://blakes-business.tymckinney2222.workers.dev';
-  var DASHBOARD_KEY = 'RooRooDashy$22'; // <-- PASTE YOUR DASHBOARD_KEY HERE (between the quotes)
+  var DASHBOARD_KEY = ''; // <-- PASTE YOUR DASHBOARD_KEY HERE (between the quotes)
   var inboxRequests = [];
 
   function fetchInbox() {
@@ -1043,7 +1136,7 @@
       inboxRequests = inboxRequests.filter(function(r) { return r.id !== id; });
       renderInbox();
       updateInboxBadge();
-      showToast('✅ Booked & added to customers!');
+      showToast('✅ Booked & added to calendar!');
     })
     .catch(function(err) {
       showToast('⚠️ Saved locally but server cleanup failed');
@@ -1067,6 +1160,137 @@
       showToast('⚠️ Network error');
       console.log(err);
     });
+  }
+
+  // ---- CALENDAR ----
+  var calendarMonth = new Date();
+  var calSelectedDate = null;
+
+  function renderCalendar() {
+    var year = calendarMonth.getFullYear();
+    var month = calendarMonth.getMonth();
+
+    var firstDay = new Date(year, month, 1).getDay();
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    var monthName = calendarMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    var todayObj = new Date();
+    var todayStr = todayObj.getFullYear() + '-' + String(todayObj.getMonth()+1).padStart(2,'0') + '-' + String(todayObj.getDate()).padStart(2,'0');
+
+    var html = '<div class="cal-header">' +
+      '<button class="cal-nav" onclick="changeMonth(-1)">‹</button>' +
+      '<div class="cal-title">' + monthName + '</div>' +
+      '<button class="cal-nav" onclick="changeMonth(1)">›</button>' +
+      '</div>';
+
+    html += '<div class="cal-grid">';
+    ['S','M','T','W','T','F','S'].forEach(function(d) {
+      html += '<div class="cal-dow">' + d + '</div>';
+    });
+
+    for (var i = 0; i < firstDay; i++) {
+      html += '<div class="cal-day cal-empty"></div>';
+    }
+
+    for (var d = 1; d <= daysInMonth; d++) {
+      var dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      var dayBookings = data.bookings.filter(function(b) { return b.date === dateStr; });
+      var classes = 'cal-day';
+      if (dateStr === todayStr) classes += ' cal-today';
+      if (dayBookings.length) classes += ' cal-has-events';
+      if (dateStr === calSelectedDate) classes += ' cal-selected';
+
+      html += '<div class="' + classes + '" onclick="selectCalDay(\'' + dateStr + '\')">';
+      html += '<div class="cal-num">' + d + '</div>';
+      if (dayBookings.length) {
+        html += '<div class="cal-dots">';
+        var dotCount = Math.min(dayBookings.length, 3);
+        for (var j = 0; j < dotCount; j++) {
+          html += '<span class="cal-dot"></span>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    html += '</div>';
+    html += '<div id="calDayDetails"></div>';
+
+    document.getElementById('calendarContainer').innerHTML = html;
+
+    if (calSelectedDate) {
+      selectCalDay(calSelectedDate, true);
+    } else {
+      showUpcomingBookings();
+    }
+  }
+
+  function changeMonth(delta) {
+    calendarMonth.setMonth(calendarMonth.getMonth() + delta);
+    calSelectedDate = null;
+    renderCalendar();
+  }
+
+  function selectCalDay(dateStr, skipRender) {
+    calSelectedDate = dateStr;
+    if (!skipRender) {
+      renderCalendar();
+      return;
+    }
+
+    var dayBookings = data.bookings.filter(function(b) { return b.date === dateStr; });
+    var det = document.getElementById('calDayDetails');
+    if (!det) return;
+
+    if (!dayBookings.length) {
+      det.innerHTML = '<div class="empty" style="padding:1.5rem 1rem;"><div class="empty-icon">🌟</div><p>Nothing scheduled for ' + formatDateFriendly(dateStr) + '</p></div>';
+      return;
+    }
+
+    dayBookings.sort(function(a, b) { return (a.time || '').localeCompare(b.time || ''); });
+
+    var html = '<div class="sub-heading" style="margin-top:0.8rem;">' + formatDateFriendly(dateStr) + '</div>';
+    dayBookings.forEach(function(b) {
+      html += '<div class="card booking-card">';
+      html += '<div class="card-title">👤 ' + b.name + '</div>';
+      html += '<div class="card-sub">' + b.service + '</div>';
+      if (b.time) html += '<div class="card-sub" style="font-weight:700;color:var(--blue);">🕒 ' + formatTime12(b.time) + '</div>';
+      html += '<span class="badge ' + (b.status === 'Confirmed' ? 'badge-green' : 'badge-gold') + '">' + (b.status === 'Confirmed' ? '✅ Confirmed' : '⏳ Pending') + '</span>';
+      html += '</div>';
+    });
+    det.innerHTML = html;
+  }
+
+  function showUpcomingBookings() {
+    var det = document.getElementById('calDayDetails');
+    if (!det) return;
+
+    var today = new Date();
+    var todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+    var upcoming = data.bookings.filter(function(b) {
+      return b.date && b.date >= todayStr;
+    }).sort(function(a, b) {
+      var at = (a.date || '') + 'T' + (a.time || '');
+      var bt = (b.date || '') + 'T' + (b.time || '');
+      return at.localeCompare(bt);
+    }).slice(0, 5);
+
+    if (!upcoming.length) {
+      det.innerHTML = '<div class="empty" style="padding:1.5rem 1rem;"><div class="empty-icon">🌴</div><p>No upcoming appointments. Tap a day to see details!</p></div>';
+      return;
+    }
+
+    var html = '<div class="sub-heading" style="margin-top:0.8rem;">📋 Next Up</div>';
+    upcoming.forEach(function(b) {
+      var dateStr = formatDateFriendly(b.date);
+      var timeStr = formatTime12(b.time);
+      html += '<div class="card booking-card">';
+      html += '<div class="card-title">👤 ' + b.name + '</div>';
+      html += '<div class="card-sub">' + b.service + '</div>';
+      html += '<div class="card-sub" style="font-weight:700;color:var(--blue);">🕒 ' + dateStr + (timeStr ? ' @ ' + timeStr : '') + '</div>';
+      html += '</div>';
+    });
+    det.innerHTML = html;
   }
 
   // Init
