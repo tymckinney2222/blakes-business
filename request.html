@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Request Service — Blake's Business 🐾</title>
+<meta name="theme-color" content="#2d6a4f"/>
+<meta name="description" content="Request dog walking or lawn care service from Blake's Business in Loveland, CO."/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green: #2d6a4f;
+    --green-dark: #1b4332;
+    --green-light: #52b788;
+    --green-pale: #d8f3dc;
+    --gold: #f4a261;
+    --gold-dark: #e76f51;
+    --red: #c1121f;
+    --purple: #7b2d8b;
+    --blue: #1e6091;
+    --bg: #f0faf4;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --shadow: 0 4px 20px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    padding: 2.2rem 1.5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    color: white;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='30' cy='42' rx='14' ry='12' fill='rgba(255,255,255,0.04)'/%3E%3Ccircle cx='14' cy='25' r='5' fill='rgba(255,255,255,0.04)'/%3E%3Ccircle cx='30' cy='20' r='5' fill='rgba(255,255,255,0.04)'/%3E%3Ccircle cx='46' cy='25' r='5' fill='rgba(255,255,255,0.04)'/%3E%3C/svg%3E");
+  }
+  .hero h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem;
+    margin-bottom: 0.3rem;
+    position: relative;
+    line-height: 1.1;
+  }
+  .hero .tagline {
+    font-size: 0.95rem;
+    opacity: 0.92;
+    position: relative;
+    margin-bottom: 0.8rem;
+  }
+  .hero .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .hero .pill {
+    background: rgba(255,255,255,0.18);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+  }
+
+  /* INTRO CARD */
+  .intro {
+    background: white;
+    margin: -1rem 1rem 0;
+    border-radius: 18px;
+    padding: 1.2rem 1.3rem;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    z-index: 2;
+  }
+  .intro p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .intro p strong { color: var(--green); }
+
+  /* SECTION */
+  .section {
+    padding: 1.5rem 1rem 0.5rem;
+  }
+  .section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    color: var(--green);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* SERVICE CARDS */
+  .services {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+  }
+  .svc-card {
+    background: white;
+    border: 3px solid transparent;
+    border-radius: 14px;
+    padding: 0.9rem 0.8rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    box-shadow: var(--shadow);
+  }
+  .svc-card:active { transform: scale(0.97); }
+  .svc-card.selected {
+    border-color: var(--green-light);
+    background: var(--green-pale);
+    box-shadow: 0 6px 20px rgba(82,183,136,0.3);
+  }
+  .svc-card .svc-icon { font-size: 1.8rem; }
+  .svc-card .svc-name {
+    font-weight: 800;
+    font-size: 0.82rem;
+    margin-top: 4px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .svc-card .svc-price {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    color: var(--gold-dark);
+    margin-top: 4px;
+  }
+  .svc-card.selected .svc-price { color: var(--green); }
+
+  /* FORM CARD */
+  .form-card {
+    background: white;
+    margin: 1rem;
+    border-radius: 18px;
+    padding: 1.2rem;
+    box-shadow: var(--shadow);
+  }
+  .form-group { margin-bottom: 0.9rem; }
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--muted);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .form-group label .req { color: var(--red); }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--bg);
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--green-light);
+    background: white;
+  }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* SUBMIT BUTTON */
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.15rem;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: white;
+    box-shadow: 0 6px 20px rgba(244,162,97,0.4);
+    transition: transform 0.15s;
+    margin-top: 0.6rem;
+  }
+  .btn-submit:active { transform: scale(0.97); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .reassure {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.8rem;
+    line-height: 1.4;
+  }
+
+  /* SUCCESS SCREEN */
+  .success-card {
+    background: white;
+    margin: 1rem;
+    border-radius: 18px;
+    padding: 2rem 1.4rem;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    border-top: 6px solid var(--green-light);
+    display: none;
+  }
+  .success-card.show { display: block; animation: pop 0.4s ease; }
+  @keyframes pop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .success-card .success-icon {
+    font-size: 3.5rem;
+    margin-bottom: 0.4rem;
+    animation: wag 1.2s ease infinite;
+    display: inline-block;
+  }
+  @keyframes wag {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(8deg); }
+  }
+  .success-card h2 {
+    font-family: 'Fredoka One', cursive;
+    color: var(--green);
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .success-card .subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1.2rem;
+  }
+  .recap {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    text-align: left;
+    margin-bottom: 1rem;
+    font-size: 0.88rem;
+  }
+  .recap .recap-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .recap .recap-row:last-child { border-bottom: none; }
+  .recap .recap-label { color: var(--muted); font-weight: 700; }
+  .recap .recap-val { color: var(--text); font-weight: 700; text-align: right; }
+  .next-steps {
+    background: var(--green-pale);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    text-align: left;
+    font-size: 0.85rem;
+    color: var(--green-dark);
+    line-height: 1.5;
+  }
+  .next-steps strong { color: var(--green); }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 1.5rem 1rem 2rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .footer .biz-name { font-family: 'Fredoka One', cursive; color: var(--green); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--red);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: transform 0.3s;
+    z-index: 300;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .error { border-color: var(--red) !important; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>🐾 Blake's Business 🌿</h1>
+  <div class="tagline">Friendly dog walking & lawn care</div>
+  <div class="badge-row">
+    <span class="pill">📍 Loveland, CO</span>
+    <span class="pill">⏰ Reliable</span>
+    <span class="pill">💚 Local Kid</span>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="formApp">
+
+  <!-- INTRO -->
+  <div class="intro">
+    <p>Hi! I'm <strong>Blake</strong> — I walk dogs and mow lawns right here in Loveland. Fill out the form below and I'll text or call to confirm your appointment within 24 hours. <span style="color:var(--gold-dark);">Thanks for supporting a young entrepreneur! 🐾</span></p>
+  </div>
+
+  <!-- SERVICES -->
+  <div class="section">
+    <div class="section-title">🛎️ Pick a Service</div>
+    <div class="services" id="services">
+      <div class="svc-card" data-service="Dog Walk 15min" data-price="5" onclick="selectService(this)">
+        <div class="svc-icon">🐕</div>
+        <div class="svc-name">Dog Walk<br/>15 min</div>
+        <div class="svc-price">$5</div>
+      </div>
+      <div class="svc-card" data-service="Dog Walk 30min" data-price="10" onclick="selectService(this)">
+        <div class="svc-icon">🐕‍🦺</div>
+        <div class="svc-name">Dog Walk<br/>30 min</div>
+        <div class="svc-price">$10</div>
+      </div>
+      <div class="svc-card" data-service="Lawn Front" data-price="15" onclick="selectService(this)">
+        <div class="svc-icon">🌿</div>
+        <div class="svc-name">Mow Lawn<br/>Front</div>
+        <div class="svc-price">$15</div>
+      </div>
+      <div class="svc-card" data-service="Lawn Front+Back" data-price="25" onclick="selectService(this)">
+        <div class="svc-icon">🌳</div>
+        <div class="svc-name">Mow Lawn<br/>Front + Back</div>
+        <div class="svc-price">$25</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-card">
+    <div class="form-group">
+      <label>Your Name <span class="req">*</span></label>
+      <input type="text" id="fName" placeholder="Mrs. Johnson" autocomplete="name"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone <span class="req">*</span></label>
+        <input type="tel" id="fPhone" placeholder="555-123-4567" autocomplete="tel"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="fEmail" placeholder="optional" autocomplete="email"/>
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#fff8e7,#ffeed0);border:2px dashed var(--gold);border-radius:12px;padding:0.9rem 1rem;margin-bottom:0.9rem;font-size:0.88rem;color:#7a4a00;text-align:center;line-height:1.55;">
+      📚 <strong>A note from Blake:</strong> I'm in school until 3:30 on weekdays! ✏️ I'm ready to roll any time after that — or pretty much all day on weekends! ⚽🐾
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date <span class="req">*</span></label>
+        <input type="date" id="fDate"/>
+      </div>
+      <div class="form-group">
+        <label>Time <span class="req">*</span></label>
+        <input type="time" id="fTime"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Service Address <span class="req">*</span></label>
+      <input type="text" id="fAddress" placeholder="123 Oak Street, Loveland CO" autocomplete="street-address"/>
+    </div>
+    <div class="form-group">
+      <label>Anything Blake should know? 🐶</label>
+      <textarea id="fNotes" placeholder="e.g. Friendly golden retriever named Max, gate code 1234, lots of toys in the yard..."></textarea>
+    </div>
+
+    <button class="btn-submit" onclick="submitRequest()">🐾 Send Request to Blake!</button>
+
+    <div class="reassure">
+      🔒 Your info is only used to schedule your service. <br/>Blake or his mom will reach out within 24 hours.
+    </div>
+  </div>
+
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div class="success-card" id="successCard">
+  <div class="success-icon">🐾</div>
+  <h2 id="successName">Thanks!</h2>
+  <div class="subtitle">Your request was sent to Blake. Here's what you signed up for:</div>
+  <div class="recap" id="recap"></div>
+  <div class="next-steps">
+    <strong>📞 What's next?</strong><br/>
+    Blake or his mom will <strong>text or call you within 24 hours</strong> to confirm the appointment. Make sure your phone's ready! 🐶
+  </div>
+  <div style="margin-top:1.2rem;">
+    <button class="btn-submit" style="background:linear-gradient(135deg, var(--green-light), var(--green));box-shadow:0 6px 20px rgba(45,106,79,0.3);" onclick="resetForm()">📝 Submit Another Request</button>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="biz-name">🐾 Blake's Business 🌿</div>
+  <div>Loveland, CO · Run by Blake & family</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let selectedService = null;
+  let selectedPrice = 0;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2400);
+  }
+
+  function selectService(el) {
+    document.querySelectorAll('.svc-card').forEach(function(c) { c.classList.remove('selected'); });
+    el.classList.add('selected');
+    selectedService = el.getAttribute('data-service');
+    selectedPrice = Number(el.getAttribute('data-price'));
+  }
+
+  function formatTime12(t) {
+    if (!t) return '';
+    const parts = t.split(':');
+    const h = Number(parts[0]);
+    const m = Number(parts[1]);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return h12 + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  }
+
+  function formatDateFriendly(d) {
+    if (!d) return '';
+    const dt = new Date(d + 'T00:00:00');
+    return dt.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  }
+
+  function markError(id, hasError) {
+    const el = document.getElementById(id);
+    if (hasError) el.classList.add('error');
+    else el.classList.remove('error');
+  }
+
+  function submitRequest() {
+    const name = document.getElementById('fName').value.trim();
+    const phone = document.getElementById('fPhone').value.trim();
+    const email = document.getElementById('fEmail').value.trim();
+    const date = document.getElementById('fDate').value;
+    const time = document.getElementById('fTime').value;
+    const address = document.getElementById('fAddress').value.trim();
+    const notes = document.getElementById('fNotes').value.trim();
+
+    let firstError = null;
+    markError('fName', !name);
+    if (!name && !firstError) firstError = 'Please enter your name';
+    markError('fPhone', !phone);
+    if (!phone && !firstError) firstError = 'Please enter your phone number';
+    markError('fDate', !date);
+    if (!date && !firstError) firstError = 'Please pick a date';
+    markError('fTime', !time);
+    if (!time && !firstError) firstError = 'Please pick a time';
+    markError('fAddress', !address);
+    if (!address && !firstError) firstError = 'Please enter your address';
+
+    if (!selectedService) {
+      firstError = firstError || 'Please pick a service above';
+    }
+
+    if (firstError) {
+      showToast('⚠️ ' + firstError);
+      return;
+    }
+
+    // BACKEND COMING IN STEP 2 — for now, just show the confirmation screen.
+    // The Cloudflare Worker will be wired up here to POST the request and notify Blake's mom.
+
+    const request = {
+      name: name,
+      phone: phone,
+      email: email,
+      service: selectedService,
+      price: selectedPrice,
+      date: date,
+      time: time,
+      address: address,
+      notes: notes,
+      submittedAt: new Date().toISOString()
+    };
+
+    // Log to console so you can see the data flowing during testing
+    console.log('Request submitted:', request);
+
+    showSuccess(request);
+  }
+
+  function showSuccess(r) {
+    document.getElementById('successName').textContent = 'Thanks, ' + r.name.split(' ')[0] + '! 🎉';
+    const recap = document.getElementById('recap');
+    recap.innerHTML =
+      '<div class="recap-row"><span class="recap-label">Service</span><span class="recap-val">' + r.service + ' — $' + r.price + '</span></div>' +
+      '<div class="recap-row"><span class="recap-label">When</span><span class="recap-val">' + formatDateFriendly(r.date) + '<br/>' + formatTime12(r.time) + '</span></div>' +
+      '<div class="recap-row"><span class="recap-label">Address</span><span class="recap-val">' + r.address + '</span></div>' +
+      '<div class="recap-row"><span class="recap-label">Contact</span><span class="recap-val">' + r.phone + (r.email ? '<br/>' + r.email : '') + '</span></div>';
+
+    document.getElementById('formApp').style.display = 'none';
+    document.getElementById('successCard').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetForm() {
+    ['fName','fPhone','fEmail','fAddress','fNotes','fTime'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.querySelectorAll('.svc-card').forEach(function(c) { c.classList.remove('selected'); });
+    selectedService = null;
+    selectedPrice = 0;
+    document.getElementById('successCard').classList.remove('show');
+    document.getElementById('formApp').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Set tomorrow as default date (most requests are for the next day, not today)
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const yyyy = tomorrow.getFullYear();
+  const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+  const dd = String(tomorrow.getDate()).padStart(2, '0');
+  document.getElementById('fDate').value = yyyy + '-' + mm + '-' + dd;
+
+  // Don't allow past dates
+  const today = new Date();
+  const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  document.getElementById('fDate').setAttribute('min', todayStr);
+
+  // Default time = 4:00 PM (after school!)
+  document.getElementById('fTime').value = '16:00';
+</script>
+</body>
+</html>
