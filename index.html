@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Blake's Business 🐾</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#2d6a4f"/>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green: #2d6a4f;
+    --green-light: #52b788;
+    --green-pale: #d8f3dc;
+    --gold: #f4a261;
+    --red: #c1121f;
+    --purple: #7b2d8b;
+    --blue: #1e6091;
+    --white: #ffffff;
+    --bg: #f0faf4;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .header {
+    background: linear-gradient(135deg, var(--green) 0%, #1b4332 100%);
+    padding: 1.2rem 1.5rem 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='20' cy='30' rx='12' ry='10' fill='rgba(255,255,255,0.03)'/%3E%3Ccircle cx='9' cy='18' r='4' fill='rgba(255,255,255,0.03)'/%3E%3Ccircle cx='20' cy='14' r='4' fill='rgba(255,255,255,0.03)'/%3E%3Ccircle cx='31' cy='18' r='4' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E");
+  }
+  .header h1 { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: #fff; position: relative; }
+  .header p { color: rgba(255,255,255,0.75); font-size: 0.85rem; position: relative; margin-top: 2px; }
+
+  .earnings-banner {
+    background: linear-gradient(90deg, var(--gold), #e76f51);
+    margin: 1rem 1rem 0;
+    border-radius: 14px;
+    padding: 0.9rem 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+  }
+  .earnings-banner .label { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.05em; }
+  .earnings-banner .amount { font-family: 'Fredoka One', cursive; font-size: 2rem; color: white; }
+  .earnings-banner .jobs { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 1rem 1rem 0;
+    overflow-x: auto;
+  }
+  .tab {
+    flex: 1;
+    min-width: 70px;
+    padding: 8px 6px;
+    border: none;
+    border-radius: 12px 12px 0 0;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: rgba(0,0,0,0.06);
+    color: var(--muted);
+    transition: all 0.2s;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .tab.active { background: white; color: var(--green); box-shadow: 0 -2px 8px rgba(0,0,0,0.08); }
+  .tab .tab-icon { font-size: 1.1rem; display: block; }
+
+  .content {
+    background: white;
+    margin: 0 1rem;
+    border-radius: 0 0 18px 18px;
+    padding: 1.2rem;
+    box-shadow: var(--shadow);
+    min-height: 300px;
+  }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    color: var(--green);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .form-group { margin-bottom: 0.8rem; }
+  .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background: var(--bg);
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green-light); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  .btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-green { background: var(--green); color: white; box-shadow: 0 4px 12px rgba(45,106,79,0.3); }
+  .btn-gold { background: var(--gold); color: white; box-shadow: 0 4px 12px rgba(244,162,97,0.3); }
+  .btn-red { background: var(--red); color: white; box-shadow: 0 4px 12px rgba(193,18,31,0.25); }
+  .btn-sm { padding: 6px 12px; font-size: 0.8rem; width: auto; border-radius: 8px; font-family: 'Nunito', sans-serif; font-weight: 700; border: none; cursor: pointer; }
+
+  .card {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.7rem;
+    border-left: 4px solid var(--green-light);
+    position: relative;
+  }
+  .card .card-title { font-weight: 800; font-size: 0.95rem; color: var(--text); padding-right: 70px; }
+  .card .card-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .card .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 65%; }
+  .card.dog-card { border-left-color: #7b2d8b; }
+  .card.job-card { border-left-color: var(--gold); }
+  .card.booking-card { border-left-color: var(--blue); }
+
+  .empty { text-align: center; padding: 2rem 1rem; color: var(--muted); }
+  .empty .empty-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .empty p { font-size: 0.85rem; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .badge-green { background: var(--green-pale); color: var(--green); }
+  .badge-gold { background: #fff3e0; color: #e65100; }
+  .badge-purple { background: #f3e5f5; color: var(--purple); }
+  .badge-blue { background: #e3f2fd; color: var(--blue); }
+
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: transform 0.3s;
+    z-index: 300;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .divider { border: none; border-top: 2px dashed #e5e7eb; margin: 1rem 0; }
+  .sub-heading { font-size: 0.8rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+  .stat { background: var(--bg); border-radius: 10px; padding: 10px 8px; text-align: center; }
+  .stat .stat-num { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: var(--green); }
+  .stat .stat-label { font-size: 0.65rem; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 1rem;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+  .modal-header {
+    background: linear-gradient(135deg, var(--green), #1b4332);
+    color: white;
+    padding: 1rem 1.2rem;
+    border-radius: 18px 18px 0 0;
+    position: relative;
+  }
+  .modal-header h2 { font-family: 'Fredoka One', cursive; font-size: 1.2rem; }
+  .modal-header .close-x {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(255,255,255,0.2); color: white;
+    border: none; width: 30px; height: 30px;
+    border-radius: 50%; font-size: 1rem; font-weight: 700; cursor: pointer;
+  }
+  .modal-body { padding: 1rem 1.2rem; }
+  .modal-footer { padding: 0 1.2rem 1.2rem; display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
+
+  .invoice-box {
+    background: var(--bg);
+    border: 2px dashed var(--green-light);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+  }
+  .invoice-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(45,106,79,0.15);
+  }
+  .invoice-head .biz { font-family: 'Fredoka One', cursive; color: var(--green); font-size: 1rem; }
+  .invoice-head .inv-num { font-size: 0.7rem; color: var(--muted); text-align: right; font-weight: 700; }
+  .invoice-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .invoice-line .desc { flex: 1; }
+  .invoice-line .amt { font-weight: 700; color: var(--green); }
+  .invoice-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid var(--green);
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    color: var(--green);
+  }
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    cursor: pointer;
+  }
+  .checkbox-row input { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+  .checkbox-row .ch-amt { margin-left: auto; font-weight: 700; color: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🐾 Blake's Business 🌿</h1>
+  <p>Dog Walking & Lawn Care — Loveland, CO</p>
+</div>
+
+<div class="earnings-banner">
+  <div>
+    <div class="label">Total Earned 💰</div>
+    <div class="amount" id="totalEarned">$0.00</div>
+  </div>
+  <div style="text-align:right;">
+    <div class="jobs" id="jobCount">0 jobs completed</div>
+    <div class="jobs" id="pendingCount">0 bookings pending</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab(event,'money')"><span class="tab-icon">💰</span>Money</button>
+  <button class="tab" onclick="switchTab(event,'customers')"><span class="tab-icon">👥</span>Customers</button>
+  <button class="tab" onclick="switchTab(event,'dogs')"><span class="tab-icon">🐾</span>Dogs</button>
+  <button class="tab" onclick="switchTab(event,'bookings')"><span class="tab-icon">📅</span>Bookings</button>
+</div>
+
+<div class="content">
+
+  <!-- MONEY TAB -->
+  <div class="page active" id="page-money">
+    <div class="section-title">💰 Log a Job</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Service</label>
+        <select id="jobService">
+          <option value="Dog Walk 15min - $5">🐾 Dog Walk 15min — $5</option>
+          <option value="Dog Walk 30min - $10">🐾 Dog Walk 30min — $10</option>
+          <option value="Lawn Front - $15">🌿 Lawn Front — $15</option>
+          <option value="Lawn Front+Back - $25">🌿 Lawn Front+Back — $25</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Customer</label>
+        <input type="text" id="jobCustomer" placeholder="Who was it for?"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <input type="text" id="jobNotes" placeholder="e.g. Max was super good today!"/>
+    </div>
+    <button class="btn btn-gold" onclick="logJob()">✅ Log Completed Job!</button>
+
+    <hr class="divider"/>
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="statJobs">0</div><div class="stat-label">Jobs Done</div></div>
+      <div class="stat"><div class="stat-num" id="statWalks">0</div><div class="stat-label">Dog Walks</div></div>
+      <div class="stat"><div class="stat-num" id="statLawns">0</div><div class="stat-label">Lawns Mowed</div></div>
+    </div>
+
+    <div class="sub-heading">Recent Jobs</div>
+    <div id="jobsList"><div class="empty"><div class="empty-icon">💸</div><p>No jobs yet! Go get your first customer!</p></div></div>
+  </div>
+
+  <!-- CUSTOMERS TAB -->
+  <div class="page" id="page-customers">
+    <div class="section-title">👥 Add Customer</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="custName" placeholder="Mrs. Johnson"/>
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="custPhone" placeholder="555-1234"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email (for invoices)</label>
+      <input type="email" id="custEmail" placeholder="mrs.johnson@email.com"/>
+    </div>
+    <div class="form-group">
+      <label>Address / Notes</label>
+      <input type="text" id="custNotes" placeholder="123 Oak St, blue house"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Service They Want</label>
+        <select id="custService">
+          <option value="Dog Walking">🐾 Dog Walking</option>
+          <option value="Lawn Mowing">🌿 Lawn Mowing</option>
+          <option value="Both">Both!</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Yard Size (if lawn)</label>
+        <select id="custYard">
+          <option value="N/A">N/A</option>
+          <option value="Front only">Front only</option>
+          <option value="Front & Back">Front & Back</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-green" onclick="addCustomer()">➕ Add Customer</button>
+    <hr class="divider"/>
+    <div class="sub-heading">My Customers</div>
+    <div id="customersList"><div class="empty"><div class="empty-icon">👥</div><p>No customers yet — hand out those flyers!</p></div></div>
+  </div>
+
+  <!-- DOGS TAB -->
+  <div class="page" id="page-dogs">
+    <div class="section-title">🐾 Add Dog Info</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Dog's Name</label>
+        <input type="text" id="dogName" placeholder="Max"/>
+      </div>
+      <div class="form-group">
+        <label>Breed</label>
+        <input type="text" id="dogBreed" placeholder="Golden Retriever"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Owner's Name</label>
+        <input type="text" id="dogOwner" placeholder="Mrs. Johnson"/>
+      </div>
+      <div class="form-group">
+        <label>Leash Puller?</label>
+        <select id="dogPull">
+          <option value="No">No 😇</option>
+          <option value="A little">A little 😅</option>
+          <option value="YES">YES 😤</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Personality & Notes</label>
+      <textarea id="dogNotes" rows="2" placeholder="e.g. Super friendly, loves treats, knows sit and stay..."></textarea>
+    </div>
+    <button class="btn btn-green" onclick="addDog()" style="background:var(--purple);box-shadow:0 4px 12px rgba(123,45,139,0.3)">🐾 Save Dog Info</button>
+    <hr class="divider"/>
+    <div class="sub-heading">My Dogs 🐶</div>
+    <div id="dogsList"><div class="empty"><div class="empty-icon">🐶</div><p>No dogs saved yet! Add your first furry client!</p></div></div>
+  </div>
+
+  <!-- BOOKINGS TAB -->
+  <div class="page" id="page-bookings">
+    <div class="section-title">📅 New Booking Request</div>
+    <div class="form-group">
+      <label>Customer Name</label>
+      <input type="text" id="bookName" placeholder="Mrs. Johnson"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="bookDate"/>
+      </div>
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="bookTime"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Service</label>
+        <select id="bookService">
+          <option value="Dog Walk 15min - $5">🐾 Dog Walk 15min — $5</option>
+          <option value="Dog Walk 30min - $10">🐾 Dog Walk 30min — $10</option>
+          <option value="Lawn Front - $15">🌿 Lawn Front — $15</option>
+          <option value="Lawn Front+Back - $25">🌿 Lawn Front+Back — $25</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="bookStatus">
+          <option value="Pending">⏳ Pending</option>
+          <option value="Confirmed">✅ Confirmed</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-green" onclick="addBooking()" style="background:var(--blue);box-shadow:0 4px 12px rgba(30,96,145,0.3)">📅 Save Booking</button>
+    <hr class="divider"/>
+    <div class="sub-heading">Upcoming Bookings</div>
+    <div id="bookingsList"><div class="empty"><div class="empty-icon">📅</div><p>No bookings yet! Get out there!</p></div></div>
+  </div>
+
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📧 Send Invoice</h2>
+      <button class="close-x" onclick="closeInvoice()">✕</button>
+    </div>
+    <div class="modal-body" id="invoiceBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-green" onclick="sendInvoice('sms')" style="font-size:0.9rem;">💬 Text It</button>
+      <button class="btn btn-gold" onclick="sendInvoice('email')" style="font-size:0.9rem;">✉️ Email It</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ Saved!</div>
+
+<script>
+  // ---- DATA ----
+  let data = {
+    jobs: [],
+    customers: [],
+    dogs: [],
+    bookings: []
+  };
+
+  try {
+    const saved = localStorage.getItem('blakes_business');
+    if (saved) data = JSON.parse(saved);
+  } catch(e) {}
+
+  data.jobs.forEach(j => {
+    if (!j.id) j.id = Date.now() + Math.random();
+    if (j.paid === undefined) j.paid = false;
+  });
+
+  function save() {
+    try { localStorage.setItem('blakes_business', JSON.stringify(data)); } catch(e) {}
+    updateBanner();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function switchTab(ev, tab) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + tab).classList.add('active');
+    ev.currentTarget.classList.add('active');
+  }
+
+  function getJobPrice(service) {
+    if (service.indexOf('$5') !== -1) return 5;
+    if (service.indexOf('$10') !== -1) return 10;
+    if (service.indexOf('$15') !== -1) return 15;
+    if (service.indexOf('$25') !== -1) return 25;
+    return 0;
+  }
+
+  function updateBanner() {
+    const total = data.jobs.reduce((s, j) => s + getJobPrice(j.service), 0);
+    document.getElementById('totalEarned').textContent = '$' + total.toFixed(2);
+    document.getElementById('jobCount').textContent = data.jobs.length + ' job' + (data.jobs.length !== 1 ? 's' : '') + ' completed';
+    const pending = data.bookings.filter(b => b.status === 'Pending').length;
+    document.getElementById('pendingCount').textContent = pending + ' booking' + (pending !== 1 ? 's' : '') + ' pending';
+    document.getElementById('statJobs').textContent = data.jobs.length;
+    document.getElementById('statWalks').textContent = data.jobs.filter(j => j.service.indexOf('Dog') !== -1).length;
+    document.getElementById('statLawns').textContent = data.jobs.filter(j => j.service.indexOf('Lawn') !== -1).length;
+  }
+
+  function logJob() {
+    const service = document.getElementById('jobService').value;
+    const customer = document.getElementById('jobCustomer').value.trim() || 'Unknown';
+    const notes = document.getElementById('jobNotes').value.trim();
+    const date = new Date().toLocaleDateString();
+    data.jobs.unshift({ id: Date.now() + Math.random(), service: service, customer: customer, notes: notes, date: date, paid: false });
+    save();
+    renderJobs();
+    document.getElementById('jobCustomer').value = '';
+    document.getElementById('jobNotes').value = '';
+    showToast('💰 Job logged! Ka-ching!!');
+  }
+
+  function deleteJob(i) {
+    data.jobs.splice(i, 1);
+    save();
+    renderJobs();
+  }
+
+  function togglePaid(i) {
+    data.jobs[i].paid = !data.jobs[i].paid;
+    save();
+    renderJobs();
+    showToast(data.jobs[i].paid ? '✅ Marked paid!' : '↩️ Marked unpaid');
+  }
+
+  function renderJobs() {
+    const el = document.getElementById('jobsList');
+    if (!data.jobs.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">💸</div><p>No jobs yet! Go get your first customer!</p></div>'; return; }
+    el.innerHTML = data.jobs.map(function(j, i) {
+      return '<div class="card job-card">' +
+        '<div class="card-actions">' +
+          '<button class="btn-sm" onclick="togglePaid(' + i + ')" style="background:' + (j.paid ? 'var(--green)' : '#e5e7eb') + ';color:' + (j.paid ? 'white' : 'var(--muted)') + ';">' + (j.paid ? '✓ Paid' : 'Unpaid') + '</button>' +
+          '<button class="btn-sm" onclick="openInvoiceForJob(' + i + ')" style="background:var(--blue);color:white;">📧</button>' +
+          '<button class="btn-sm btn-red" onclick="deleteJob(' + i + ')" style="background:var(--red);color:white;">✕</button>' +
+        '</div>' +
+        '<div class="card-title">' + j.service + '</div>' +
+        '<div class="card-sub">👤 ' + j.customer + ' &nbsp;·&nbsp; 📅 ' + j.date + '</div>' +
+        (j.notes ? '<div class="card-sub" style="margin-top:3px;">📝 ' + j.notes + '</div>' : '') +
+      '</div>';
+    }).join('');
+    updateBanner();
+  }
+
+  function addCustomer() {
+    const name = document.getElementById('custName').value.trim();
+    if (!name) { showToast('⚠️ Please enter a name!'); return; }
+    data.customers.push({
+      name: name,
+      phone: document.getElementById('custPhone').value.trim(),
+      email: document.getElementById('custEmail').value.trim(),
+      notes: document.getElementById('custNotes').value.trim(),
+      service: document.getElementById('custService').value,
+      yard: document.getElementById('custYard').value
+    });
+    save();
+    renderCustomers();
+    ['custName','custPhone','custEmail','custNotes'].forEach(function(id) { document.getElementById(id).value = ''; });
+    showToast('👥 Customer added!');
+  }
+
+  function deleteCustomer(i) {
+    data.customers.splice(i, 1);
+    save();
+    renderCustomers();
+  }
+
+  function renderCustomers() {
+    const el = document.getElementById('customersList');
+    if (!data.customers.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><p>No customers yet — hand out those flyers!</p></div>'; return; }
+    el.innerHTML = data.customers.map(function(c, i) {
+      const unpaidCount = data.jobs.filter(function(j) { return !j.paid && j.customer.toLowerCase() === c.name.toLowerCase(); }).length;
+      return '<div class="card">' +
+        '<div class="card-actions">' +
+          '<button class="btn-sm" onclick="openInvoiceForCustomer(' + i + ')" style="background:var(--blue);color:white;">📧 Invoice' + (unpaidCount ? ' (' + unpaidCount + ')' : '') + '</button>' +
+          '<button class="btn-sm" onclick="deleteCustomer(' + i + ')" style="background:var(--red);color:white;">✕</button>' +
+        '</div>' +
+        '<div class="card-title">👤 ' + c.name + '</div>' +
+        (c.phone ? '<div class="card-sub">📞 ' + c.phone + '</div>' : '') +
+        (c.email ? '<div class="card-sub">✉️ ' + c.email + '</div>' : '') +
+        (c.notes ? '<div class="card-sub">📍 ' + c.notes + '</div>' : '') +
+        '<span class="badge ' + (c.service === 'Dog Walking' ? 'badge-purple' : c.service === 'Lawn Mowing' ? 'badge-green' : 'badge-gold') + '">' + c.service + '</span>' +
+        (c.yard !== 'N/A' ? '<span class="badge badge-green" style="margin-left:4px;">' + c.yard + '</span>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  function addDog() {
+    const name = document.getElementById('dogName').value.trim();
+    if (!name) { showToast('⚠️ Please enter the dog\'s name!'); return; }
+    data.dogs.push({
+      name: name,
+      breed: document.getElementById('dogBreed').value.trim(),
+      owner: document.getElementById('dogOwner').value.trim(),
+      pull: document.getElementById('dogPull').value,
+      notes: document.getElementById('dogNotes').value.trim()
+    });
+    save();
+    renderDogs();
+    ['dogName','dogBreed','dogOwner','dogNotes'].forEach(function(id) { document.getElementById(id).value = ''; });
+    showToast('🐾 Dog saved!');
+  }
+
+  function deleteDog(i) {
+    data.dogs.splice(i, 1);
+    save();
+    renderDogs();
+  }
+
+  function renderDogs() {
+    const el = document.getElementById('dogsList');
+    if (!data.dogs.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🐶</div><p>No dogs saved yet!</p></div>'; return; }
+    el.innerHTML = data.dogs.map(function(d, i) {
+      return '<div class="card dog-card">' +
+        '<div class="card-actions">' +
+          '<button class="btn-sm" onclick="deleteDog(' + i + ')" style="background:var(--red);color:white;">✕</button>' +
+        '</div>' +
+        '<div class="card-title">🐶 ' + d.name + (d.breed ? ' <span style="font-weight:400;font-size:0.85rem;color:var(--muted);">· ' + d.breed + '</span>' : '') + '</div>' +
+        (d.owner ? '<div class="card-sub">👤 Owner: ' + d.owner + '</div>' : '') +
+        '<span class="badge badge-purple">Leash pull: ' + d.pull + '</span>' +
+        (d.notes ? '<div class="card-sub" style="margin-top:5px;">📝 ' + d.notes + '</div>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  function addBooking() {
+    const name = document.getElementById('bookName').value.trim();
+    if (!name) { showToast('⚠️ Please enter a customer name!'); return; }
+    data.bookings.unshift({
+      name: name,
+      date: document.getElementById('bookDate').value,
+      time: document.getElementById('bookTime').value,
+      service: document.getElementById('bookService').value,
+      status: document.getElementById('bookStatus').value
+    });
+    data.bookings.sort(function(a, b) {
+      const at = (a.date || '9999-12-31') + 'T' + (a.time || '23:59');
+      const bt = (b.date || '9999-12-31') + 'T' + (b.time || '23:59');
+      return at.localeCompare(bt);
+    });
+    save();
+    renderBookings();
+    ['bookName','bookTime'].forEach(function(id) { document.getElementById(id).value = ''; });
+    showToast('📅 Booking saved!');
+  }
+
+  function deleteBooking(i) {
+    data.bookings.splice(i, 1);
+    save();
+    renderBookings();
+  }
+
+  function markDone(i) {
+    const b = data.bookings[i];
+    data.jobs.unshift({
+      id: Date.now() + Math.random(),
+      service: b.service,
+      customer: b.name,
+      notes: 'From booking',
+      date: b.date || new Date().toLocaleDateString(),
+      paid: false
+    });
+    data.bookings.splice(i, 1);
+    save();
+    renderBookings();
+    renderJobs();
+    showToast('💰 Booking marked done & logged!');
+  }
+
+  function formatTime12(t) {
+    if (!t) return '';
+    const parts = t.split(':');
+    const h = Number(parts[0]);
+    const m = Number(parts[1]);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return h12 + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  }
+
+  function formatDateFriendly(d) {
+    if (!d) return '';
+    const dt = new Date(d + 'T00:00:00');
+    return dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+
+  function renderBookings() {
+    const el = document.getElementById('bookingsList');
+    if (!data.bookings.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><p>No bookings yet! Get out there!</p></div>'; return; }
+    el.innerHTML = data.bookings.map(function(b, i) {
+      const dateStr = formatDateFriendly(b.date);
+      const timeStr = formatTime12(b.time);
+      const when = [dateStr, timeStr].filter(Boolean).join(' @ ');
+      return '<div class="card booking-card">' +
+        '<div class="card-actions">' +
+          '<button class="btn-sm" onclick="markDone(' + i + ')" style="background:var(--green);color:white;">✓ Done</button>' +
+          '<button class="btn-sm" onclick="deleteBooking(' + i + ')" style="background:var(--red);color:white;">✕</button>' +
+        '</div>' +
+        '<div class="card-title">👤 ' + b.name + '</div>' +
+        '<div class="card-sub">' + b.service + '</div>' +
+        (when ? '<div class="card-sub" style="margin-top:4px;font-weight:700;color:var(--blue);">🕒 ' + when + '</div>' : '') +
+        '<span class="badge ' + (b.status === 'Confirmed' ? 'badge-green' : 'badge-gold') + '">' + (b.status === 'Confirmed' ? '✅ Confirmed' : '⏳ Pending') + '</span>' +
+      '</div>';
+    }).join('');
+    updateBanner();
+  }
+
+  // ---- INVOICE ----
+  let currentInvoice = null;
+
+  function openInvoiceForJob(jobIdx) {
+    const j = data.jobs[jobIdx];
+    const cust = data.customers.find(function(c) { return c.name.toLowerCase() === j.customer.toLowerCase(); });
+    currentInvoice = {
+      customerName: j.customer,
+      email: cust && cust.email ? cust.email : '',
+      phone: cust && cust.phone ? cust.phone : '',
+      jobs: [Object.assign({}, j, { jobIdx: jobIdx, selected: true })]
+    };
+    showInvoiceModal();
+  }
+
+  function openInvoiceForCustomer(custIdx) {
+    const c = data.customers[custIdx];
+    const matches = [];
+    data.jobs.forEach(function(j, idx) {
+      if (j.customer.toLowerCase() === c.name.toLowerCase()) {
+        matches.push(Object.assign({}, j, { jobIdx: idx, selected: !j.paid }));
+      }
+    });
+    if (!matches.length) {
+      showToast('No jobs found for this customer yet!');
+      return;
+    }
+    currentInvoice = {
+      customerName: c.name,
+      email: c.email || '',
+      phone: c.phone || '',
+      jobs: matches
+    };
+    showInvoiceModal();
+  }
+
+  function showInvoiceModal() {
+    renderInvoiceBody();
+    document.getElementById('invoiceModal').classList.add('show');
+  }
+
+  function closeInvoice() {
+    document.getElementById('invoiceModal').classList.remove('show');
+    currentInvoice = null;
+  }
+
+  function toggleInvoiceJob(i) {
+    currentInvoice.jobs[i].selected = !currentInvoice.jobs[i].selected;
+    renderInvoiceBody();
+  }
+
+  function renderInvoiceBody() {
+    if (!currentInvoice) return;
+    const invNum = 'INV-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*900+100);
+    const today = new Date().toLocaleDateString();
+
+    let jobsListHtml = '';
+    if (currentInvoice.jobs.length > 1) {
+      jobsListHtml = '<div style="margin-bottom:0.6rem;"><div class="sub-heading">Pick jobs to include:</div>' +
+        currentInvoice.jobs.map(function(j, i) {
+          return '<label class="checkbox-row">' +
+            '<input type="checkbox" ' + (j.selected ? 'checked' : '') + ' onchange="toggleInvoiceJob(' + i + ')"/>' +
+            '<span>' + j.service.split(' - ')[0] + ' · ' + j.date + ' ' + (j.paid ? '<span style="color:var(--green);font-size:0.7rem;">(paid)</span>' : '') + '</span>' +
+            '<span class="ch-amt">$' + getJobPrice(j.service) + '</span>' +
+          '</label>';
+        }).join('') + '</div>';
+    }
+
+    const selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
+    const total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
+
+    const invoiceHtml =
+      '<div class="invoice-box">' +
+        '<div class="invoice-head">' +
+          '<div>' +
+            '<div class="biz">🐾 Blake\'s Business 🌿</div>' +
+            '<div style="font-size:0.7rem;color:var(--muted);">Dog Walking & Lawn Care</div>' +
+          '</div>' +
+          '<div class="inv-num">' + invNum + '<br/><span style="font-weight:400;">' + today + '</span></div>' +
+        '</div>' +
+        '<div style="font-size:0.82rem;margin-bottom:0.5rem;"><strong>Bill to:</strong> ' + currentInvoice.customerName + '</div>' +
+        (selected.length === 0 ? '<div style="color:var(--muted);text-align:center;padding:1rem;font-size:0.85rem;">No jobs selected</div>' :
+          selected.map(function(j) {
+            return '<div class="invoice-line">' +
+              '<span class="desc">' + j.service.split(' - ')[0] + '<br/><span style="font-size:0.7rem;color:var(--muted);">' + j.date + '</span></span>' +
+              '<span class="amt">$' + getJobPrice(j.service).toFixed(2) + '</span>' +
+            '</div>';
+          }).join('')
+        ) +
+        '<div class="invoice-total"><span>TOTAL</span><span>$' + total.toFixed(2) + '</span></div>' +
+      '</div>' +
+      jobsListHtml +
+      '<div style="font-size:0.75rem;color:var(--muted);text-align:center;">' +
+        (currentInvoice.phone ? '📞 ' + currentInvoice.phone : '<em>No phone on file</em>') + '<br/>' +
+        (currentInvoice.email ? '✉️ ' + currentInvoice.email : '<em>No email on file</em>') +
+      '</div>';
+    document.getElementById('invoiceBody').innerHTML = invoiceHtml;
+  }
+
+  function buildInvoiceText() {
+    const selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
+    const total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
+    const today = new Date().toLocaleDateString();
+
+    let txt = 'Hi ' + currentInvoice.customerName + '!\n\n';
+    txt += 'Here\'s your invoice from Blake\'s Business 🐾🌿\n';
+    txt += 'Date: ' + today + '\n\n';
+    txt += 'Services:\n';
+    selected.forEach(function(j) {
+      txt += '  • ' + j.service.split(' - ')[0] + ' (' + j.date + ') — $' + getJobPrice(j.service).toFixed(2) + '\n';
+    });
+    txt += '\nTOTAL DUE: $' + total.toFixed(2) + '\n\n';
+    txt += 'Thanks for your business!\n- Blake';
+    return txt;
+  }
+
+  function sendInvoice(method) {
+    if (!currentInvoice) return;
+    const selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
+    if (!selected.length) {
+      showToast('⚠️ Pick at least one job!');
+      return;
+    }
+    const text = buildInvoiceText();
+    const total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
+    let url = '';
+
+    if (method === 'sms') {
+      if (!currentInvoice.phone) {
+        showToast('⚠️ No phone number saved!');
+        return;
+      }
+      const phone = currentInvoice.phone.replace(/[^\d+]/g, '');
+      url = 'sms:' + phone + '?&body=' + encodeURIComponent(text);
+    } else if (method === 'email') {
+      if (!currentInvoice.email) {
+        showToast('⚠️ No email saved!');
+        return;
+      }
+      const subject = 'Invoice from Blake\'s Business — $' + total.toFixed(2);
+      url = 'mailto:' + currentInvoice.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
+    }
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_top';
+    a.rel = 'noopener noreferrer';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() { a.remove(); }, 200);
+
+    showToast(method === 'sms' ? '💬 Opening Messages...' : '✉️ Opening Gmail...');
+  }
+
+  document.getElementById('invoiceModal').addEventListener('click', function(e) {
+    if (e.target.id === 'invoiceModal') closeInvoice();
+  });
+
+  // Init
+  updateBanner();
+  renderJobs();
+  renderCustomers();
+  renderDogs();
+  renderBookings();
+  document.getElementById('bookDate').valueAsDate = new Date();
+</script>
+</body>
+</html>
