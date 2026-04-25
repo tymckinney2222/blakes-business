@@ -488,10 +488,7 @@
       return;
     }
 
-    // BACKEND COMING IN STEP 2 — for now, just show the confirmation screen.
-    // The Cloudflare Worker will be wired up here to POST the request and notify Blake's mom.
-
-    const request = {
+    const requestData = {
       name: name,
       phone: phone,
       email: email,
@@ -500,14 +497,35 @@
       date: date,
       time: time,
       address: address,
-      notes: notes,
-      submittedAt: new Date().toISOString()
+      notes: notes
     };
 
-    // Log to console so you can see the data flowing during testing
-    console.log('Request submitted:', request);
+    const btn = document.querySelector('.btn-submit');
+    const originalLabel = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Sending...';
 
-    showSuccess(request);
+    fetch('https://blakes-business.tymckinney2222.workers.dev/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData)
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data && data.ok) {
+        showSuccess(requestData);
+      } else {
+        showToast('⚠️ Something went wrong. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = originalLabel;
+      }
+    })
+    .catch(function(err) {
+      showToast('⚠️ Network error. Check your connection and try again.');
+      btn.disabled = false;
+      btn.innerHTML = originalLabel;
+      console.log('Submit error:', err);
+    });
   }
 
   function showSuccess(r) {
