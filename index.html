@@ -6,6 +6,11 @@
 <title>Blake's Business 🐾</title>
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" content="#2d6a4f"/>
+<link rel="apple-touch-icon" href="icon.svg"/>
+<link rel="icon" type="image/svg+xml" href="icon.svg"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Blake's"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
   :root {
@@ -299,6 +304,7 @@
   <button class="tab" onclick="switchTab(event,'customers')"><span class="tab-icon">👥</span>Customers</button>
   <button class="tab" onclick="switchTab(event,'dogs')"><span class="tab-icon">🐾</span>Dogs</button>
   <button class="tab" onclick="switchTab(event,'bookings')"><span class="tab-icon">📅</span>Bookings</button>
+  <button class="tab" id="tab-inbox" onclick="switchTab(event,'inbox')"><span class="tab-icon">📥</span>Inbox</button>
 </div>
 
 <div class="content">
@@ -461,6 +467,16 @@
     <div id="bookingsList"><div class="empty"><div class="empty-icon">📅</div><p>No bookings yet! Get out there!</p></div></div>
   </div>
 
+  <!-- INBOX TAB -->
+  <div class="page" id="page-inbox">
+    <div class="section-title">📥 Customer Requests</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+      <div class="sub-heading" style="margin-bottom:0;">Pending Requests</div>
+      <button class="btn-sm" onclick="fetchInbox()" style="background:var(--blue);color:white;">🔄 Refresh</button>
+    </div>
+    <div id="inboxList"><div class="empty"><div class="empty-icon">📭</div><p>Loading...</p></div></div>
+  </div>
+
 </div>
 
 <!-- INVOICE MODAL -->
@@ -482,7 +498,7 @@
 
 <script>
   // ---- DATA ----
-  let data = {
+  var data = {
     jobs: [],
     customers: [],
     dogs: [],
@@ -490,11 +506,11 @@
   };
 
   try {
-    const saved = localStorage.getItem('blakes_business');
+    var saved = localStorage.getItem('blakes_business');
     if (saved) data = JSON.parse(saved);
   } catch(e) {}
 
-  data.jobs.forEach(j => {
+  data.jobs.forEach(function(j) {
     if (!j.id) j.id = Date.now() + Math.random();
     if (j.paid === undefined) j.paid = false;
   });
@@ -505,15 +521,15 @@
   }
 
   function showToast(msg) {
-    const t = document.getElementById('toast');
+    var t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
+    setTimeout(function() { t.classList.remove('show'); }, 2200);
   }
 
   function switchTab(ev, tab) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
     document.getElementById('page-' + tab).classList.add('active');
     ev.currentTarget.classList.add('active');
   }
@@ -527,21 +543,21 @@
   }
 
   function updateBanner() {
-    const total = data.jobs.reduce((s, j) => s + getJobPrice(j.service), 0);
+    var total = data.jobs.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
     document.getElementById('totalEarned').textContent = '$' + total.toFixed(2);
     document.getElementById('jobCount').textContent = data.jobs.length + ' job' + (data.jobs.length !== 1 ? 's' : '') + ' completed';
-    const pending = data.bookings.filter(b => b.status === 'Pending').length;
+    var pending = data.bookings.filter(function(b) { return b.status === 'Pending'; }).length;
     document.getElementById('pendingCount').textContent = pending + ' booking' + (pending !== 1 ? 's' : '') + ' pending';
     document.getElementById('statJobs').textContent = data.jobs.length;
-    document.getElementById('statWalks').textContent = data.jobs.filter(j => j.service.indexOf('Dog') !== -1).length;
-    document.getElementById('statLawns').textContent = data.jobs.filter(j => j.service.indexOf('Lawn') !== -1).length;
+    document.getElementById('statWalks').textContent = data.jobs.filter(function(j) { return j.service.indexOf('Dog') !== -1; }).length;
+    document.getElementById('statLawns').textContent = data.jobs.filter(function(j) { return j.service.indexOf('Lawn') !== -1; }).length;
   }
 
   function logJob() {
-    const service = document.getElementById('jobService').value;
-    const customer = document.getElementById('jobCustomer').value.trim() || 'Unknown';
-    const notes = document.getElementById('jobNotes').value.trim();
-    const date = new Date().toLocaleDateString();
+    var service = document.getElementById('jobService').value;
+    var customer = document.getElementById('jobCustomer').value.trim() || 'Unknown';
+    var notes = document.getElementById('jobNotes').value.trim();
+    var date = new Date().toLocaleDateString();
     data.jobs.unshift({ id: Date.now() + Math.random(), service: service, customer: customer, notes: notes, date: date, paid: false });
     save();
     renderJobs();
@@ -564,7 +580,7 @@
   }
 
   function renderJobs() {
-    const el = document.getElementById('jobsList');
+    var el = document.getElementById('jobsList');
     if (!data.jobs.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">💸</div><p>No jobs yet! Go get your first customer!</p></div>'; return; }
     el.innerHTML = data.jobs.map(function(j, i) {
       return '<div class="card job-card">' +
@@ -582,7 +598,7 @@
   }
 
   function addCustomer() {
-    const name = document.getElementById('custName').value.trim();
+    var name = document.getElementById('custName').value.trim();
     if (!name) { showToast('⚠️ Please enter a name!'); return; }
     data.customers.push({
       name: name,
@@ -605,10 +621,10 @@
   }
 
   function renderCustomers() {
-    const el = document.getElementById('customersList');
+    var el = document.getElementById('customersList');
     if (!data.customers.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><p>No customers yet — hand out those flyers!</p></div>'; return; }
     el.innerHTML = data.customers.map(function(c, i) {
-      const unpaidCount = data.jobs.filter(function(j) { return !j.paid && j.customer.toLowerCase() === c.name.toLowerCase(); }).length;
+      var unpaidCount = data.jobs.filter(function(j) { return !j.paid && j.customer.toLowerCase() === c.name.toLowerCase(); }).length;
       return '<div class="card">' +
         '<div class="card-actions">' +
           '<button class="btn-sm" onclick="openInvoiceForCustomer(' + i + ')" style="background:var(--blue);color:white;">📧 Invoice' + (unpaidCount ? ' (' + unpaidCount + ')' : '') + '</button>' +
@@ -625,7 +641,7 @@
   }
 
   function addDog() {
-    const name = document.getElementById('dogName').value.trim();
+    var name = document.getElementById('dogName').value.trim();
     if (!name) { showToast('⚠️ Please enter the dog\'s name!'); return; }
     data.dogs.push({
       name: name,
@@ -647,7 +663,7 @@
   }
 
   function renderDogs() {
-    const el = document.getElementById('dogsList');
+    var el = document.getElementById('dogsList');
     if (!data.dogs.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🐶</div><p>No dogs saved yet!</p></div>'; return; }
     el.innerHTML = data.dogs.map(function(d, i) {
       return '<div class="card dog-card">' +
@@ -663,7 +679,7 @@
   }
 
   function addBooking() {
-    const name = document.getElementById('bookName').value.trim();
+    var name = document.getElementById('bookName').value.trim();
     if (!name) { showToast('⚠️ Please enter a customer name!'); return; }
     data.bookings.unshift({
       name: name,
@@ -673,8 +689,8 @@
       status: document.getElementById('bookStatus').value
     });
     data.bookings.sort(function(a, b) {
-      const at = (a.date || '9999-12-31') + 'T' + (a.time || '23:59');
-      const bt = (b.date || '9999-12-31') + 'T' + (b.time || '23:59');
+      var at = (a.date || '9999-12-31') + 'T' + (a.time || '23:59');
+      var bt = (b.date || '9999-12-31') + 'T' + (b.time || '23:59');
       return at.localeCompare(bt);
     });
     save();
@@ -690,7 +706,7 @@
   }
 
   function markDone(i) {
-    const b = data.bookings[i];
+    var b = data.bookings[i];
     data.jobs.unshift({
       id: Date.now() + Math.random(),
       service: b.service,
@@ -708,27 +724,27 @@
 
   function formatTime12(t) {
     if (!t) return '';
-    const parts = t.split(':');
-    const h = Number(parts[0]);
-    const m = Number(parts[1]);
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    const h12 = h % 12 === 0 ? 12 : h % 12;
+    var parts = t.split(':');
+    var h = Number(parts[0]);
+    var m = Number(parts[1]);
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    var h12 = h % 12 === 0 ? 12 : h % 12;
     return h12 + ':' + String(m).padStart(2,'0') + ' ' + ampm;
   }
 
   function formatDateFriendly(d) {
     if (!d) return '';
-    const dt = new Date(d + 'T00:00:00');
+    var dt = new Date(d + 'T00:00:00');
     return dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
   }
 
   function renderBookings() {
-    const el = document.getElementById('bookingsList');
+    var el = document.getElementById('bookingsList');
     if (!data.bookings.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><p>No bookings yet! Get out there!</p></div>'; return; }
     el.innerHTML = data.bookings.map(function(b, i) {
-      const dateStr = formatDateFriendly(b.date);
-      const timeStr = formatTime12(b.time);
-      const when = [dateStr, timeStr].filter(Boolean).join(' @ ');
+      var dateStr = formatDateFriendly(b.date);
+      var timeStr = formatTime12(b.time);
+      var when = [dateStr, timeStr].filter(Boolean).join(' @ ');
       return '<div class="card booking-card">' +
         '<div class="card-actions">' +
           '<button class="btn-sm" onclick="markDone(' + i + ')" style="background:var(--green);color:white;">✓ Done</button>' +
@@ -744,11 +760,11 @@
   }
 
   // ---- INVOICE ----
-  let currentInvoice = null;
+  var currentInvoice = null;
 
   function openInvoiceForJob(jobIdx) {
-    const j = data.jobs[jobIdx];
-    const cust = data.customers.find(function(c) { return c.name.toLowerCase() === j.customer.toLowerCase(); });
+    var j = data.jobs[jobIdx];
+    var cust = data.customers.find(function(c) { return c.name.toLowerCase() === j.customer.toLowerCase(); });
     currentInvoice = {
       customerName: j.customer,
       email: cust && cust.email ? cust.email : '',
@@ -759,8 +775,8 @@
   }
 
   function openInvoiceForCustomer(custIdx) {
-    const c = data.customers[custIdx];
-    const matches = [];
+    var c = data.customers[custIdx];
+    var matches = [];
     data.jobs.forEach(function(j, idx) {
       if (j.customer.toLowerCase() === c.name.toLowerCase()) {
         matches.push(Object.assign({}, j, { jobIdx: idx, selected: !j.paid }));
@@ -796,10 +812,10 @@
 
   function renderInvoiceBody() {
     if (!currentInvoice) return;
-    const invNum = 'INV-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*900+100);
-    const today = new Date().toLocaleDateString();
+    var invNum = 'INV-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(Math.random()*900+100);
+    var today = new Date().toLocaleDateString();
 
-    let jobsListHtml = '';
+    var jobsListHtml = '';
     if (currentInvoice.jobs.length > 1) {
       jobsListHtml = '<div style="margin-bottom:0.6rem;"><div class="sub-heading">Pick jobs to include:</div>' +
         currentInvoice.jobs.map(function(j, i) {
@@ -811,10 +827,10 @@
         }).join('') + '</div>';
     }
 
-    const selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
-    const total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
+    var selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
+    var total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
 
-    const invoiceHtml =
+    var invoiceHtml =
       '<div class="invoice-box">' +
         '<div class="invoice-head">' +
           '<div>' +
@@ -843,11 +859,11 @@
   }
 
   function buildInvoiceText() {
-    const selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
-    const total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
-    const today = new Date().toLocaleDateString();
+    var selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
+    var total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
+    var today = new Date().toLocaleDateString();
 
-    let txt = 'Hi ' + currentInvoice.customerName + '!\n\n';
+    var txt = 'Hi ' + currentInvoice.customerName + '!\n\n';
     txt += 'Here\'s your invoice from Blake\'s Business 🐾🌿\n';
     txt += 'Date: ' + today + '\n\n';
     txt += 'Services:\n';
@@ -861,32 +877,32 @@
 
   function sendInvoice(method) {
     if (!currentInvoice) return;
-    const selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
+    var selected = currentInvoice.jobs.filter(function(j) { return j.selected; });
     if (!selected.length) {
       showToast('⚠️ Pick at least one job!');
       return;
     }
-    const text = buildInvoiceText();
-    const total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
-    let url = '';
+    var text = buildInvoiceText();
+    var total = selected.reduce(function(s, j) { return s + getJobPrice(j.service); }, 0);
+    var url = '';
 
     if (method === 'sms') {
       if (!currentInvoice.phone) {
         showToast('⚠️ No phone number saved!');
         return;
       }
-      const phone = currentInvoice.phone.replace(/[^\d+]/g, '');
+      var phone = currentInvoice.phone.replace(/[^\d+]/g, '');
       url = 'sms:' + phone + '?&body=' + encodeURIComponent(text);
     } else if (method === 'email') {
       if (!currentInvoice.email) {
         showToast('⚠️ No email saved!');
         return;
       }
-      const subject = 'Invoice from Blake\'s Business — $' + total.toFixed(2);
+      var subject = 'Invoice from Blake\'s Business — $' + total.toFixed(2);
       url = 'mailto:' + currentInvoice.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
     }
 
-    const a = document.createElement('a');
+    var a = document.createElement('a');
     a.href = url;
     a.target = '_top';
     a.rel = 'noopener noreferrer';
@@ -902,12 +918,165 @@
     if (e.target.id === 'invoiceModal') closeInvoice();
   });
 
+  // ---- INBOX (customer requests from request.html) ----
+  var WORKER_URL = 'https://blakes-business.tymckinney2222.workers.dev';
+  var DASHBOARD_KEY = ''; // <-- PASTE YOUR DASHBOARD_KEY HERE (between the quotes)
+  var inboxRequests = [];
+
+  function fetchInbox() {
+    var listEl = document.getElementById('inboxList');
+    if (!DASHBOARD_KEY) {
+      listEl.innerHTML = '<div class="empty"><div class="empty-icon">🔑</div><p>DASHBOARD_KEY not set yet! Edit this file and paste your secret key.</p></div>';
+      return;
+    }
+    fetch(WORKER_URL + '/requests', {
+      method: 'GET',
+      headers: { 'X-Dashboard-Key': DASHBOARD_KEY }
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(d) {
+      if (d.error) {
+        listEl.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Error: ' + d.error + '</p></div>';
+        return;
+      }
+      inboxRequests = d.requests || [];
+      renderInbox();
+      updateInboxBadge();
+    })
+    .catch(function(err) {
+      listEl.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Network error. Try refresh.</p></div>';
+      console.log('Inbox fetch error:', err);
+    });
+  }
+
+  function renderInbox() {
+    var el = document.getElementById('inboxList');
+    if (!inboxRequests.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>No new requests. You\'re all caught up!</p></div>';
+      return;
+    }
+    el.innerHTML = inboxRequests.map(function(r) {
+      var dateStr = formatDateFriendly(r.date);
+      var timeStr = formatTime12(r.time);
+      var when = [dateStr, timeStr].filter(Boolean).join(' @ ');
+      var submitted = new Date(r.createdAt).toLocaleString();
+      return '<div class="card" style="border-left-color:#7b2d8b;">' +
+        '<div class="card-title">📥 ' + r.name + '</div>' +
+        '<div class="card-sub" style="font-weight:700;color:var(--purple);">' + r.service + ' — $' + r.price + '</div>' +
+        (when ? '<div class="card-sub">🕒 ' + when + '</div>' : '') +
+        '<div class="card-sub">📞 <a href="tel:' + r.phone + '" style="color:var(--blue);font-weight:700;">' + r.phone + '</a></div>' +
+        (r.email ? '<div class="card-sub">✉️ ' + r.email + '</div>' : '') +
+        '<div class="card-sub">📍 ' + r.address + '</div>' +
+        (r.notes ? '<div class="card-sub" style="margin-top:5px;">📝 ' + r.notes + '</div>' : '') +
+        '<div class="card-sub" style="margin-top:6px;font-size:0.7rem;opacity:0.7;">Sent: ' + submitted + '</div>' +
+        '<div style="display:flex;gap:6px;margin-top:10px;">' +
+          '<button class="btn-sm" onclick="acceptInboxRequest(\'' + r.id + '\')" style="background:var(--green);color:white;flex:1;padding:8px;">✅ Accept</button>' +
+          '<button class="btn-sm" onclick="declineInboxRequest(\'' + r.id + '\')" style="background:var(--red);color:white;padding:8px 14px;">❌ Decline</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function updateInboxBadge() {
+    var tab = document.getElementById('tab-inbox');
+    if (!tab) return;
+    var existing = tab.querySelector('.tab-badge');
+    if (inboxRequests.length > 0) {
+      if (!existing) {
+        var b = document.createElement('span');
+        b.className = 'tab-badge';
+        b.style.cssText = 'background:var(--red);color:white;border-radius:10px;padding:1px 6px;font-size:0.65rem;margin-left:3px;font-weight:800;display:inline-block;';
+        tab.appendChild(b);
+        existing = b;
+      }
+      existing.textContent = inboxRequests.length;
+    } else if (existing) {
+      existing.remove();
+    }
+  }
+
+  function acceptInboxRequest(id) {
+    var req = null;
+    for (var i = 0; i < inboxRequests.length; i++) {
+      if (inboxRequests[i].id === id) { req = inboxRequests[i]; break; }
+    }
+    if (!req) return;
+
+    data.bookings.unshift({
+      name: req.name,
+      date: req.date,
+      time: req.time,
+      service: req.service + ' - $' + req.price,
+      status: 'Confirmed'
+    });
+    data.bookings.sort(function(a, b) {
+      var at = (a.date || '9999-12-31') + 'T' + (a.time || '23:59');
+      var bt = (b.date || '9999-12-31') + 'T' + (b.time || '23:59');
+      return at.localeCompare(bt);
+    });
+
+    var found = false;
+    for (var j = 0; j < data.customers.length; j++) {
+      if (data.customers[j].name.toLowerCase() === req.name.toLowerCase()) { found = true; break; }
+    }
+    if (!found) {
+      data.customers.push({
+        name: req.name,
+        phone: req.phone,
+        email: req.email || '',
+        notes: req.address,
+        service: req.service.indexOf('Dog') !== -1 ? 'Dog Walking' : 'Lawn Mowing',
+        yard: 'N/A'
+      });
+    }
+
+    save();
+    renderBookings();
+    renderCustomers();
+
+    fetch(WORKER_URL + '/accept', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Dashboard-Key': DASHBOARD_KEY },
+      body: JSON.stringify({ id: id })
+    })
+    .then(function() {
+      inboxRequests = inboxRequests.filter(function(r) { return r.id !== id; });
+      renderInbox();
+      updateInboxBadge();
+      showToast('✅ Booked & added to customers!');
+    })
+    .catch(function(err) {
+      showToast('⚠️ Saved locally but server cleanup failed');
+      console.log(err);
+    });
+  }
+
+  function declineInboxRequest(id) {
+    fetch(WORKER_URL + '/decline', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Dashboard-Key': DASHBOARD_KEY },
+      body: JSON.stringify({ id: id })
+    })
+    .then(function() {
+      inboxRequests = inboxRequests.filter(function(r) { return r.id !== id; });
+      renderInbox();
+      updateInboxBadge();
+      showToast('Request declined');
+    })
+    .catch(function(err) {
+      showToast('⚠️ Network error');
+      console.log(err);
+    });
+  }
+
   // Init
   updateBanner();
   renderJobs();
   renderCustomers();
   renderDogs();
   renderBookings();
+  fetchInbox();
+  setInterval(fetchInbox, 30000); // auto-refresh inbox every 30s
   document.getElementById('bookDate').valueAsDate = new Date();
 </script>
 </body>
