@@ -1303,5 +1303,12 @@
   setInterval(fetchInbox, 30000); // auto-refresh inbox every 30s
   document.getElementById('bookDate').valueAsDate = new Date();
 </script>
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js');
+  });
+}
+  </script>
 </body>
 </html>
